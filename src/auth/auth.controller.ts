@@ -20,4 +20,31 @@ export class AuthController {
       throw new BadRequestException(e.message);
     }
   }
+
+  @Post('forgotpassword')
+  async forgotPassword(
+    @Body() resetPassword: { name: string; password: string },
+  ) {
+    try {
+      return await this.authService.resetPassword(resetPassword);
+    } catch (e) {
+      throw new BadRequestException(e.message);
+    }
+  }
+
+  @Post('confirmpassword')
+  async confirmPassword(
+    @Body()
+    confirmPassword: {
+      name: string;
+      verificationCode: string;
+      newPassword: string;
+    },
+  ) {
+    try {
+      return await this.authService.confirmPassword(confirmPassword);
+    } catch (e) {
+      throw new BadRequestException(e.message);
+    }
+  }
 }
