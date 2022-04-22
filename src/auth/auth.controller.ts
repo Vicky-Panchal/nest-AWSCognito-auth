@@ -47,4 +47,30 @@ export class AuthController {
       throw new BadRequestException(e.message);
     }
   }
+
+  @Post('admincreate')
+  async adminCreateUser(
+    @Body() createUser: { name: string; password: string; email: string },
+  ) {
+    return await this.authService.adminCreateUser(createUser);
+  }
+
+  @Post('initiateauth')
+  async adminInitiateAuth(
+    @Body()
+    createUser: {
+      name: string;
+      password: string;
+      email: string;
+    },
+  ) {
+    return await this.authService.adminInitiateAuth(createUser);
+  }
+
+  @Post('authresponse')
+  async authResponse(
+    @Body() authResponse: { session: string; password: string; name: string },
+  ) {
+    return await this.authService.respondToAuthChallenge(authResponse);
+  }
 }

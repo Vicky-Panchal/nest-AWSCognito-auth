@@ -8,6 +8,8 @@ import {
   ICognitoUserPoolData,
 } from 'amazon-cognito-identity-js';
 
+import { CognitoIdentityServiceProvider, config } from 'aws-sdk';
+
 @Injectable()
 export class AuthService {
   private userPool: CognitoUserPool;
@@ -123,6 +125,127 @@ export class AuthService {
         onSuccess(result) {
           resolve(result);
         },
+      });
+    });
+  }
+
+  adminCreateUser(createUser: { name: string; email: string }) {
+    const { name, email } = createUser;
+    const cognito = new CognitoIdentityServiceProvider({
+      apiVersion: '2016-04-18',
+      region: 'us-east-1',
+      accessKeyId: 'AKIAXFM7QH2MDATQBNEE',
+      secretAccessKey: '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',
+    });
+
+    const USERPOOLID = process.env.COGNITO_USER_POOL_ID;
+    console.log(process.env.COGNITO_USER_POOL_ID);
+    config.update({
+      region: 'us-east-1',
+      accessKeyId: 'AKIAXFM7QH2MDATQBNEE',
+      secretAccessKey: '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',
+    });
+
+    const cognitoParams = {
+      UserPoolId: USERPOOLID,
+      Username: name,
+      UserAttributes: [
+        {
+          Name: 'email',
+          Value: email,
+        },
+        {
+          Name: 'email_verified',
+          Value: 'true',
+        },
+      ],
+      TemporaryPassword: 'vicky3600',
+      MessageAction: 'SUPPRESS',
+    };
+
+    return new Promise((resolve, reject) => {
+      return cognito.adminCreateUser(cognitoParams, (err, result) => {
+        if (!result) {
+          reject(err);
+        } else {
+          console.log('----------------------');
+          console.log(result);
+          resolve(result);
+        }
+      });
+    });
+  }
+
+  adminInitiateAuth(createUser: {
+    name: string;
+    email: string;
+    password: string;
+  }) {
+    const { name, email, password } = createUser;
+
+    const params = {
+      AuthFlow: 'ADMIN_NO_SRP_AUTH',
+      ClientId: process.env.COGNITO_CLIENT_ID,
+      UserPoolId: process.env.COGNITO_USER_POOL_ID,
+      AuthParameters: {
+        USERNAME: name,
+        EMAIL: email,
+        PASSWORD: password,
+      },
+    };
+
+    const cognitoidentityserviceprovider = new CognitoIdentityServiceProvider({
+      apiVersion: '2016-04-18',
+      region: 'us-east-1',
+      accessKeyId: 'AKIAXFM7QH2MDATQBNEE',
+      secretAccessKey: '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',
+    });
+    return new Promise((resolve, reject) => {
+      return cognitoidentityserviceprovider.adminInitiateAuth(
+        params,
+        (err, result) => {
+          if (!result) {
+            reject(err);
+            console.log(err);
+          } else {
+            console.log('----------------------');
+            resolve(result);
+            console.log(result);
+          }
+        },
+      );
+    });
+  }
+
+  respondToAuthChallenge(authResponse: {
+    session: string;
+    password: string;
+    name: string;
+  }) {
+    const { session, password, name } = authResponse;
+    const params = {
+      ChallengeName: 'NEW_PASSWORD_REQUIRED',
+      ClientId: process.env.COGNITO_CLIENT_ID,
+      ChallengeResponses: {
+        NEW_PASSWORD: password,
+        USERNAME: name,
+      },
+      Session: session,
+    };
+    console.log(params);
+    const cognito = new CognitoIdentityServiceProvider({
+      apiVersion: '2016-04-18',
+      region: 'us-east-1',
+    });
+    return new Promise((resolve, reject) => {
+      return cognito.respondToAuthChallenge(params, (err, data) => {
+        if (err) {
+          console.log(err, err.stack); // an error occurred
+          reject(err);
+        } else {
+          console.log(data); // successful response
+          resolve(data);
+        }
       });
     });
   }
