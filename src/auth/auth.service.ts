@@ -134,16 +134,16 @@ export class AuthService {
     const cognito = new CognitoIdentityServiceProvider({
       apiVersion: '2016-04-18',
       region: 'us-east-1',
-      accessKeyId: 'AKIAXFM7QH2MDATQBNEE',
-      secretAccessKey: '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',
+      accessKeyId: '',
+      secretAccessKey: '',
     });
 
     const USERPOOLID = process.env.COGNITO_USER_POOL_ID;
     console.log(process.env.COGNITO_USER_POOL_ID);
     config.update({
       region: 'us-east-1',
-      accessKeyId: 'AKIAXFM7QH2MDATQBNEE',
-      secretAccessKey: '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',
+      accessKeyId: '',
+      secretAccessKey: '',
     });
 
     const cognitoParams = {
@@ -197,8 +197,8 @@ export class AuthService {
     const cognitoidentityserviceprovider = new CognitoIdentityServiceProvider({
       apiVersion: '2016-04-18',
       region: 'us-east-1',
-      accessKeyId: 'AKIAXFM7QH2MDATQBNEE',
-      secretAccessKey: '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',
+      accessKeyId: '',
+      secretAccessKey: '',
     });
     return new Promise((resolve, reject) => {
       return cognitoidentityserviceprovider.adminInitiateAuth(
